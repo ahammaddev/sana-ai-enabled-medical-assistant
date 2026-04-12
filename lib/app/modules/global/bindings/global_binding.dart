@@ -5,8 +5,6 @@ import '../controllers/global_controller.dart';
 class GlobalBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<GlobalController>(
-      () => GlobalController(),
-    );
+    Get.put(GlobalController());
   }
 }
