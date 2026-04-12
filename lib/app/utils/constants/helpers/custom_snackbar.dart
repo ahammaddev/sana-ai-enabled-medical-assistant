@@ -13,9 +13,9 @@ class CustomSnackbars {
       icon: Icon(Icons.error_outline_outlined, color: AppColors.neutral),
 
       animationDuration: const Duration(seconds: 1),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(4),
       margin: const EdgeInsets.all(15),
-      borderRadius: 15,
+      borderRadius: 4,
       backgroundColor: AppColors.tertiary,
       dismissDirection: DismissDirection.horizontal,
     );
@@ -28,9 +28,9 @@ class CustomSnackbars {
       snackPosition: SnackPosition.TOP,
       icon: Icon(Icons.check_circle_outline),
       animationDuration: const Duration(seconds: 1),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(4),
       margin: const EdgeInsets.all(15),
-      borderRadius: 15,
+      borderRadius: 4,
       backgroundColor: AppColors.primary,
       dismissDirection: DismissDirection.horizontal,
     );
