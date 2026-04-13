@@ -83,7 +83,7 @@ class ChatController extends GetxController {
     } catch (e) {
       // Handle network or parsing errors
       message.status = 'error';
-      await _dbService.insertMessage(message);
+      await _dbService.updateMessage(message);
       fetchData();
     } finally {
       replyLoading.value = false;
