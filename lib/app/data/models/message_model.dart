@@ -2,8 +2,15 @@ class MessageModel {
   String? userMessage;
   String? botMessage;
   String? status;
+  String? bottimestamp;
+  String? usertimestamp;
 
-  MessageModel({this.botMessage, this.status});
+  MessageModel({
+    this.botMessage,
+    this.status,
+    this.bottimestamp,
+    this.usertimestamp,
+  });
 
   MessageModel.fromJson(Map<String, dynamic> json) {
     userMessage = json['userMessage'];
@@ -16,6 +23,8 @@ class MessageModel {
     data['userMessage'] = this.userMessage;
     data['message'] = this.botMessage;
     data['status'] = this.status;
+    data['bottimestamp'] = this.bottimestamp;
+    data['usertimestamp'] = this.usertimestamp;
     return data;
   }
 }
