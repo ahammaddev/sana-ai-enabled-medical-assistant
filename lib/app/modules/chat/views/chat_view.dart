@@ -50,32 +50,70 @@ class ChatView extends GetView<ChatController> {
             ],
           ),
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                physics: ClampingScrollPhysics(),
-                itemCount: 3,
-                itemBuilder: (context, index) => Column(
+        body: Obx(
+          () => controller.isloading.value
+              ? Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                )
+              : Column(
                   children: [
-                    BotChatBubble(),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        physics: ClampingScrollPhysics(),
+                        itemCount: controller.messages.length,
+                        reverse: true,
+                        itemBuilder: (context, index) {
+                          final message = controller.messages[index];
+                          final isNewestMessage = index == 0;
+                          print(message.bottimestamp);
+
+                          return Column(
+                            children: [
+                              UserChatBubble(
+                                // SAFE: Provide a fallback instead of forcing a crash
+                                usermessage:
+                                    message.userMessage ??
+                                    'Message unavailable',
+                                usertimestamp: message.usertimestamp ?? '',
+                              ),
+
+                              // UI FIX: Only show the loading animation for the newest message.
+                              // Older messages will fall through to display their actual content.
+                              (controller.replyLoading.value && isNewestMessage)
+                                  ? const BotLoading()
+                                  : message.botMessage != null
+                                  ? BotChatBubble(
+                                      botMessage: message.botMessage!,
+                                      // SAFE: Handle null timestamps gracefully
+                                      timestamp: message.bottimestamp ?? '',
+                                    )
+                                  : const BotFails(),
+
+                              // BotLoading(),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    // SizedBox(height: 10),
+
+                    // BotFails(),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: PromptField(),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      '© 2026 MD. FAISAL AHAMMAD',
+                      style: theme.textTheme.bodyMedium!.copyWith(
+                        color: AppColors.primarydark,
+                      ),
+                    ),
                     SizedBox(height: 20),
-                    UserChatBubble(),
                   ],
                 ),
-              ),
-            ),
-            SizedBox(height: 10),
-            BotLoading(),
-            BotFails(),
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: PromptField(),
-            ),
-            SizedBox(height: 30),
-          ],
         ),
       ),
     );
