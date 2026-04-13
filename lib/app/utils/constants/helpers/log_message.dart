@@ -10,7 +10,7 @@ class LogMessage {
   }) {
     if (kDebugMode) {
       log('=====================================================');
-      log('$title and, the error is: message.');
+      log('$title and, $message.');
       log('=====================================================');
     }
   }
