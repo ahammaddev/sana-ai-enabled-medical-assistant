@@ -32,34 +32,78 @@ class ChatController extends GetxController {
     } finally {
       isloading.value = false;
     }
+  }
 
-    Future<void> getReply() async {
-      replyLoading.value = true;
-      final MessageModel message = await ChatRepository().getMessage(
-        prompt: promptController.text,
+  Future<void> getReply() async {
+    final now = DateTime.now();
+    final time = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+    print(time);
+
+    // 1. Initial State: Create the message with just the user's input
+    MessageModel message = MessageModel(
+      userMessage: promptController.text,
+      usertimestamp: time,
+    );
+
+    // 2. CRITICAL: Capture the auto-generated ID from SQLite
+    // When you insert without an ID, SQLite creates one. We must save this ID
+    // so we can update this exact row later instead of creating a new one.
+    int generatedId = await _dbService.insertMessage(message);
+    message.id = generatedId;
+    promptController.clear();
+    fetchData();
+
+    replyLoading.value = true;
+
+    try {
+      // 3. Fetch the bot's reply from the API
+      final tempmessage = await ChatRepository().getMessage(
+        prompt: message.userMessage!, // Use the saved text
       );
-      if (message.status!.toLowerCase() == 'success') {
+
+      if (tempmessage.status?.toLowerCase() == 'success') {
+        // 4. Update the local object with the bot's response
+        message.botMessage =
+            tempmessage.botMessage; // Note: Ensure this matches your model
+        message.bottimestamp = tempmessage.bottimestamp;
+        message.status = tempmessage.status;
+
+        // 5. PUSH TO DB: Call insert again. Because message.id is not null,
+        // ConflictAlgorithm.replace will update the existing row with the bot's data.
+        await _dbService.updateMessage(message);
+
+        // 6. Refresh the UI to display the newly saved bot reply
+        fetchData();
+      } else {
+        // Handle API failure gracefully (optional but recommended)
+        message.status = 'failed';
         await _dbService.insertMessage(message);
         fetchData();
       }
+    } catch (e) {
+      // Handle network or parsing errors
+      message.status = 'error';
+      await _dbService.insertMessage(message);
+      fetchData();
+    } finally {
       replyLoading.value = false;
     }
+  }
 
-    @override
-    void onInit() {
-      super.onInit();
-      fetchData();
-      blinking();
-    }
+  @override
+  void onInit() {
+    super.onInit();
+    fetchData();
+    blinking();
+  }
 
-    @override
-    void onReady() {
-      super.onReady();
-    }
+  @override
+  void onReady() {
+    super.onReady();
+  }
 
-    @override
-    void onClose() {
-      super.onClose();
-    }
+  @override
+  void onClose() {
+    super.onClose();
   }
 }
