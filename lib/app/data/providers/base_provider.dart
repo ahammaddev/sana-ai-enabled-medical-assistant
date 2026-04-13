@@ -22,13 +22,9 @@ class BaseProvider extends GetConnect {
   }) async {
     LogMessage.printLogMessage(title: 'post url', message: url);
     LogMessage.printLogMessage(title: 'post body', message: jsonEncode(body));
-    LogMessage.printLogMessage(title: 'post token', message: AppUrls.token);
+    LogMessage.printLogMessage(title: 'post token', message: token!);
     final http.Response response = await http
-        .post(
-          headers: headerData,
-          Uri.parse(AppUrls.url),
-          body: jsonEncode(body),
-        )
+        .post(headers: headerData, Uri.parse(url), body: jsonEncode(body))
         .timeout(Duration(seconds: timeOut));
 
     LogMessage.printLogMessage(
