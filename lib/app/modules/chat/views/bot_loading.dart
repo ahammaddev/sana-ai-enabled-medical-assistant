@@ -20,7 +20,7 @@ class BotLoading extends StatelessWidget {
         ),
       ),
       padding: EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
-      margin: EdgeInsets.only(right: context.width * 0.44, left: 15),
+      margin: EdgeInsets.only(right: context.width * 0.382, left: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
