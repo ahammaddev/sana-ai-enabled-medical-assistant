@@ -4,9 +4,11 @@ part of 'app_pages.dart';
 abstract class Routes {
   Routes._();
   static const GLOBAL = _Paths.GLOBAL;
+  static const CHAT = _Paths.CHAT;
 }
 
 abstract class _Paths {
   _Paths._();
   static const GLOBAL = '/global';
+  static const CHAT = '/chat';
 }
