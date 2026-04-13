@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:get/get.dart';
 import 'package:sana/app/modules/chat/views/bot_chat_bubble.dart';
+import 'package:sana/app/modules/chat/views/user_chat_bubble.dart';
 import 'package:sana/app/utils/constants/colors/app_colors.dart';
 
 import '../controllers/chat_controller.dart';
@@ -24,6 +25,7 @@ class ChatView extends GetView<ChatController> {
       child: Scaffold(
         backgroundColor: AppColors.grey.withAlpha(10),
         appBar: AppBar(
+          surfaceTintColor: AppColors.neutral,
           backgroundColor: AppColors.neutral,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -45,7 +47,19 @@ class ChatView extends GetView<ChatController> {
             ],
           ),
         ),
-        body: BotChatBubble(),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: ListView.builder(
+            itemCount: 3,
+            itemBuilder: (context, index) => Column(
+              children: [
+                BotChatBubble(),
+                SizedBox(height: 20),
+                UserChatBubble(),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
