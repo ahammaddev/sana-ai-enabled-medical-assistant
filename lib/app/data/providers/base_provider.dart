@@ -20,18 +20,26 @@ class BaseProvider extends GetConnect {
     required String? token,
     required int timeOut,
   }) async {
-    LogMessage.printLogMessage(title: 'post url', message: url);
-    LogMessage.printLogMessage(title: 'post body', message: jsonEncode(body));
-    LogMessage.printLogMessage(title: 'post token', message: token!);
-    final http.Response response = await http
-        .post(headers: headerData, Uri.parse(url), body: jsonEncode(body))
-        .timeout(Duration(seconds: timeOut));
+    try {
+      LogMessage.printLogMessage(title: 'post url', message: url);
+      LogMessage.printLogMessage(title: 'post body', message: jsonEncode(body));
+      LogMessage.printLogMessage(title: 'post token', message: token!);
+      final http.Response response = await http
+          .post(headers: headerData, Uri.parse(url), body: jsonEncode(body))
+          .timeout(Duration(seconds: timeOut));
 
-    LogMessage.printLogMessage(
-      title: 'post response url: ${Uri.parse(url)}',
-      message: response.body,
-    );
+      LogMessage.printLogMessage(
+        title: 'post response url: ${Uri.parse(url)}',
+        message: response.body,
+      );
 
-    return response;
+      return response;
+    } catch (e) {
+      LogMessage.printLogMessage(
+        title: 'NETWORK EXCEPTION',
+        message: 'Failed! Reason: $e',
+      );
+      rethrow;
+    }
   }
 }
