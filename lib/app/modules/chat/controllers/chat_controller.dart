@@ -77,7 +77,7 @@ class ChatController extends GetxController {
       } else {
         // Handle API failure gracefully (optional but recommended)
         message.status = 'failed';
-        await _dbService.insertMessage(message);
+        await _dbService.updateMessage(message);
         fetchData();
       }
     } catch (e) {

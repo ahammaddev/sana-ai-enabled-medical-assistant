@@ -68,34 +68,36 @@ class ChatView extends GetView<ChatController> {
                           final isNewestMessage = index == 0;
                           print(message.bottimestamp);
 
+                          if (index == controller.messages.length) {
+                            return Center(
+                              child: Column(
+                                children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.robot,
+                                    size: 100,
+                                    color: AppColors.primary,
+                                  ),
+
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'SANA',
+                                    style: theme.textTheme.headlineLarge,
+                                  ),
+                                  Text(
+                                    'AI-powered medical assistant',
+                                    style: theme.textTheme.titleMedium,
+                                  ),
+                                  Text(
+                                    'Developed by Faisal Ahammad',
+                                    style: theme.textTheme.titleSmall,
+                                  ),
+                                  SizedBox(height: 20),
+                                ],
+                              ),
+                            );
+                          }
                           return Column(
                             children: [
-                              Center(
-                                child: Column(
-                                  children: [
-                                    FaIcon(
-                                      FontAwesomeIcons.robot,
-                                      size: 100,
-                                      color: AppColors.primary,
-                                    ),
-
-                                    SizedBox(height: 5),
-                                    Text(
-                                      'SANA',
-                                      style: theme.textTheme.headlineLarge,
-                                    ),
-                                    Text(
-                                      'AI-powered medical assistant',
-                                      style: theme.textTheme.titleMedium,
-                                    ),
-                                    Text(
-                                      'Developed by Faisal Ahammad',
-                                      style: theme.textTheme.titleSmall,
-                                    ),
-                                    SizedBox(height: 20),
-                                  ],
-                                ),
-                              ),
                               UserChatBubble(
                                 // SAFE: Provide a fallback instead of forcing a crash
                                 usermessage:
