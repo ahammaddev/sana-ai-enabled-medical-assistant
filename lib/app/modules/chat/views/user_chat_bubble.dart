@@ -77,7 +77,12 @@ class UserChatBubble extends GetView<ChatController> {
             ),
           ),
           SizedBox(height: 10),
-          Text(usertimestamp, style: theme.textTheme.bodySmall!.copyWith()),
+          Text(
+            usertimestamp,
+            style: theme.textTheme.bodySmall!.copyWith(
+              color: Colors.grey.withAlpha(150),
+            ),
+          ),
         ],
       ),
     );

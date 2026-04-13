@@ -73,7 +73,12 @@ class BotChatBubble extends GetView<ChatController> {
             ),
           ),
           SizedBox(height: 10),
-          Text(timestamp, style: theme.textTheme.bodySmall!.copyWith()),
+          Text(
+            timestamp,
+            style: theme.textTheme.bodySmall!.copyWith(
+              color: Colors.grey.withAlpha(150),
+            ),
+          ),
         ],
       ),
     );

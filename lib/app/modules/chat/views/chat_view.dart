@@ -60,7 +60,7 @@ class ChatView extends GetView<ChatController> {
                     Expanded(
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        physics: ClampingScrollPhysics(),
+                        physics: BouncingScrollPhysics(),
                         itemCount: controller.messages.length,
                         reverse: true,
                         itemBuilder: (context, index) {
@@ -70,6 +70,32 @@ class ChatView extends GetView<ChatController> {
 
                           return Column(
                             children: [
+                              Center(
+                                child: Column(
+                                  children: [
+                                    FaIcon(
+                                      FontAwesomeIcons.robot,
+                                      size: 100,
+                                      color: AppColors.primary,
+                                    ),
+
+                                    SizedBox(height: 5),
+                                    Text(
+                                      'SANA',
+                                      style: theme.textTheme.headlineLarge,
+                                    ),
+                                    Text(
+                                      'AI-powered medical assistant',
+                                      style: theme.textTheme.titleMedium,
+                                    ),
+                                    Text(
+                                      'Developed by Faisal Ahammad',
+                                      style: theme.textTheme.titleSmall,
+                                    ),
+                                    SizedBox(height: 20),
+                                  ],
+                                ),
+                              ),
                               UserChatBubble(
                                 // SAFE: Provide a fallback instead of forcing a crash
                                 usermessage:
@@ -107,7 +133,7 @@ class ChatView extends GetView<ChatController> {
                     SizedBox(height: 10),
                     Text(
                       '© 2026 MD. FAISAL AHAMMAD',
-                      style: theme.textTheme.bodyMedium!.copyWith(
+                      style: theme.textTheme.bodySmall!.copyWith(
                         color: AppColors.primarydark,
                       ),
                     ),
