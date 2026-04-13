@@ -47,10 +47,13 @@ class PromptField extends GetView<ChatController> {
             ),
           ),
           SizedBox(width: 5),
-          Container(
-            decoration: BoxDecoration(color: Color(0xFF005BC0)),
-            padding: EdgeInsets.all(17),
-            child: Icon(Icons.send, color: AppColors.neutral),
+          InkWell(
+            onTap: () => controller.getReply(),
+            child: Container(
+              decoration: BoxDecoration(color: Color(0xFF005BC0)),
+              padding: EdgeInsets.all(17),
+              child: Icon(Icons.send, color: AppColors.neutral),
+            ),
           ),
         ],
       ),
