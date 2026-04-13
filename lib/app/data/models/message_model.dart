@@ -1,4 +1,5 @@
 class MessageModel {
+  int? id;
   String? userMessage;
   String? botMessage;
   String? status;
@@ -6,6 +7,7 @@ class MessageModel {
   String? usertimestamp;
 
   MessageModel({
+    this.userMessage,
     this.botMessage,
     this.status,
     this.bottimestamp,
@@ -16,6 +18,8 @@ class MessageModel {
     userMessage = json['userMessage'];
     botMessage = json['message'];
     status = json['status'];
+    usertimestamp = json['usertimestamp'];
+    bottimestamp = json['bottimestamp'];
   }
 
   Map<String, dynamic> toJson() {
