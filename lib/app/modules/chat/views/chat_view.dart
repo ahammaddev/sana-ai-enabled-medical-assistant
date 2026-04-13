@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:get/get.dart';
 import 'package:sana/app/modules/chat/views/bot_chat_bubble.dart';
+import 'package:sana/app/modules/chat/views/prompt_field.dart';
 import 'package:sana/app/modules/chat/views/user_chat_bubble.dart';
 import 'package:sana/app/utils/constants/colors/app_colors.dart';
 
@@ -47,18 +48,29 @@ class ChatView extends GetView<ChatController> {
             ],
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: ListView.builder(
-            itemCount: 3,
-            itemBuilder: (context, index) => Column(
-              children: [
-                BotChatBubble(),
-                SizedBox(height: 20),
-                UserChatBubble(),
-              ],
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                physics: ClampingScrollPhysics(),
+                itemCount: 3,
+                itemBuilder: (context, index) => Column(
+                  children: [
+                    BotChatBubble(),
+                    SizedBox(height: 20),
+                    UserChatBubble(),
+                  ],
+                ),
+              ),
             ),
-          ),
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: PromptField(),
+            ),
+            SizedBox(height: 30),
+          ],
         ),
       ),
     );
