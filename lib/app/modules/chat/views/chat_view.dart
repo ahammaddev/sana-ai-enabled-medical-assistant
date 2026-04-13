@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:get/get.dart';
 import 'package:sana/app/modules/chat/views/bot_chat_bubble.dart';
+import 'package:sana/app/modules/chat/views/bot_fails.dart';
+import 'package:sana/app/modules/chat/views/bot_loading.dart';
 import 'package:sana/app/modules/chat/views/prompt_field.dart';
 import 'package:sana/app/modules/chat/views/user_chat_bubble.dart';
 import 'package:sana/app/utils/constants/colors/app_colors.dart';
@@ -64,6 +66,9 @@ class ChatView extends GetView<ChatController> {
                 ),
               ),
             ),
+            SizedBox(height: 10),
+            BotLoading(),
+            BotFails(),
             SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),

@@ -61,7 +61,7 @@ class UserChatBubble extends GetView<ChatController> {
               border: Border.all(
                 // top: BorderSide(width: 1, color: Colors.white.withAlpha(200)),
                 width: 1,
-                color: AppColors.secondary.withAlpha(80),
+                color: AppColors.secondary.withAlpha(40),
               ),
             ),
             child: Text(
