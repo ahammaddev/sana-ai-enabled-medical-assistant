@@ -4,7 +4,14 @@ import 'package:sana/app/modules/chat/controllers/chat_controller.dart';
 import 'package:sana/app/utils/constants/colors/app_colors.dart';
 
 class BotChatBubble extends GetView<ChatController> {
-  const BotChatBubble({super.key});
+  const BotChatBubble({
+    super.key,
+    required this.botMessage,
+    required this.timestamp,
+  });
+
+  final String botMessage;
+  final String timestamp;
 
   @override
   Widget build(BuildContext context) {
@@ -61,15 +68,12 @@ class BotChatBubble extends GetView<ChatController> {
               ),
             ),
             child: Text(
-              'You can take aspirin to help lower your fever, as it works on the part of your brain that controls body temperature. For adults, the recommended dose is one to two tablets every three to four hours, up to six times a day. If your fever is high, meaning between 38 and 40 degrees Celsius (about 100.4 to 104 degrees Fahrenheit), or if you feel very unwell, you should contact your doctor right away.',
+              botMessage,
               style: theme.textTheme.bodySmall!.copyWith(),
             ),
           ),
           SizedBox(height: 10),
-          Text(
-            '2026-11-11 12:00:00',
-            style: theme.textTheme.bodySmall!.copyWith(),
-          ),
+          Text(timestamp, style: theme.textTheme.bodySmall!.copyWith()),
         ],
       ),
     );
