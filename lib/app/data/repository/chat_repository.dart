@@ -9,29 +9,23 @@ import 'package:sana/app/utils/constants/config/app_urls.dart';
 
 class ChatRepository extends GetConnect {
   Future<MessageModel> getMessage({required String prompt}) async {
-    final Map<String, dynamic> body = {'message': prompt};
-
-    MessageModel message = MessageModel();
-    final now = DateTime.now();
-    final time = DateFormat('yyyyy.MMMM.dd GGG hh:mm aaa').format(now);
-    message.usertimestamp = time;
-
-    message.userMessage = prompt;
+    final Map<String, dynamic> body = {"message": prompt};
 
     final http.Response response = await BaseProvider().postDataWithToken(
       url: AppUrls.url,
       body: body,
       token: AppUrls.token,
-      timeOut: 8,
+      timeOut: 150,
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      message = MessageModel.fromJson(data);
 
       final now = DateTime.now();
-      final time = DateFormat('yyyyy.MMMM.dd GGG hh:mm aaa').format(now);
-      message.botMessage = time;
+      final time = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+
+      final message = MessageModel.fromJson(data);
+      message.bottimestamp = time;
 
       return message;
     } else {
