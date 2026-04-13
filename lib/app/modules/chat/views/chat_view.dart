@@ -61,15 +61,15 @@ class ChatView extends GetView<ChatController> {
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         physics: BouncingScrollPhysics(),
-                        itemCount: controller.messages.length,
+                        itemCount: controller.messages.length + 1,
                         reverse: true,
                         itemBuilder: (context, index) {
-                          final message = controller.messages[index];
-                          final isNewestMessage = index == 0;
-                          print(message.bottimestamp);
-
                           if (index == controller.messages.length) {
-                            return Center(
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                top: 40.0,
+                                bottom: 20.0,
+                              ),
                               child: Column(
                                 children: [
                                   FaIcon(
@@ -96,6 +96,10 @@ class ChatView extends GetView<ChatController> {
                               ),
                             );
                           }
+                          final message = controller.messages[index];
+                          final isNewestMessage = index == 0;
+                          print(message.bottimestamp);
+
                           return Column(
                             children: [
                               UserChatBubble(
