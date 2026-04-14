@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

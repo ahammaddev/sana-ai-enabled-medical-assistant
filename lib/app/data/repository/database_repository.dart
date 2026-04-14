@@ -81,6 +81,16 @@ class AppDatabase {
     });
   }
 
+  Future<int> deleteMessage(MessageModel message) async {
+    Database db = await database;
+
+    return await db.delete(
+      _tableName,
+      where: 'id = ?',
+      whereArgs: [message.id],
+    );
+  }
+
   // Resource cleanup
   Future close() async {
     Database db = await database;

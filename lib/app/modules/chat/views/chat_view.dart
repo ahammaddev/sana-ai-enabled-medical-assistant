@@ -66,9 +66,13 @@ class ChatView extends GetView<ChatController> {
                         itemBuilder: (context, index) {
                           if (index == controller.messages.length) {
                             return Padding(
-                              padding: const EdgeInsets.only(
+                              padding: EdgeInsets.only(
                                 top: 40.0,
-                                bottom: 20.0,
+                                bottom: controller.messages.length == 0
+                                    ? context.mediaQuery.viewInsets.bottom > 0
+                                          ? context.height * 0.14
+                                          : context.height * 0.06
+                                    : 20.0,
                               ),
                               child: Column(
                                 children: [
@@ -143,7 +147,7 @@ class ChatView extends GetView<ChatController> {
                         color: AppColors.primarydark,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 25),
                   ],
                 ),
         ),

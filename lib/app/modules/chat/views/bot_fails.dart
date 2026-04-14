@@ -20,7 +20,7 @@ class BotFails extends StatelessWidget {
         ),
       ),
       padding: EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
-      margin: EdgeInsets.only(right: context.width * 0.57, left: 0, bottom: 10),
+      margin: EdgeInsets.only(right: context.width * 0.52, left: 0, bottom: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
