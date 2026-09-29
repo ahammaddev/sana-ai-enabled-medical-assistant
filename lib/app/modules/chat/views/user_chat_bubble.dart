@@ -45,7 +45,6 @@ class UserChatBubble extends GetView<ChatController> {
             child: Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
                 border: Border.all(
                   width: 1,
                   color: AppColors.secondary.withAlpha(40),
@@ -53,7 +52,10 @@ class UserChatBubble extends GetView<ChatController> {
               ),
               child: Text(
                 usermessage,
-                style: theme.textTheme.bodySmall!.copyWith(),
+                style: theme.textTheme.bodyMedium!.copyWith(
+                  fontSize: 15,
+                  height: 1.35,
+                ),
               ),
             ),
           ),

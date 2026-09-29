@@ -67,14 +67,16 @@ class BotChatBubble extends GetView<ChatController> {
                     offset: Offset(0, 2),
                   ),
                 ],
-                borderRadius: BorderRadius.circular(5),
                 border: Border(
                   top: BorderSide(width: 1, color: Colors.white.withAlpha(200)),
                 ),
               ),
               child: Text(
                 botMessage,
-                style: theme.textTheme.bodySmall!.copyWith(),
+                style: theme.textTheme.bodyMedium!.copyWith(
+                  fontSize: 15,
+                  height: 1.35,
+                ),
               ),
             ),
           ),

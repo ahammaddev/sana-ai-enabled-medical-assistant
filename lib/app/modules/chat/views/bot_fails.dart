@@ -21,10 +21,6 @@ class BotFails extends StatelessWidget {
             border: Border(
               left: BorderSide(width: 2, color: AppColors.tertiary.withAlpha(80)),
             ),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(5),
-              bottomLeft: Radius.circular(5),
-            ),
           ),
           padding: const EdgeInsets.all(10),
           child: Column(
