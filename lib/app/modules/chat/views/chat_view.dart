@@ -104,30 +104,34 @@ class ChatView extends GetView<ChatController> {
                           final isNewestMessage = index == 0;
                           print(message.bottimestamp);
 
-                          return Column(
-                            children: [
-                              UserChatBubble(
-                                // SAFE: Provide a fallback instead of forcing a crash
-                                usermessage:
-                                    message.userMessage ??
-                                    'Message unavailable',
-                                usertimestamp: message.usertimestamp ?? '',
-                              ),
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                UserChatBubble(
+                                  // SAFE: Provide a fallback instead of forcing a crash
+                                  usermessage:
+                                      message.userMessage ??
+                                      'Message unavailable',
+                                  usertimestamp: message.usertimestamp ?? '',
+                                ),
+                                const SizedBox(height: 12),
+                                // UI FIX: Only show the loading animation for the newest message.
+                                // Older messages will fall through to display their actual content.
+                                (controller.replyLoading.value && isNewestMessage)
+                                    ? const BotLoading()
+                                    : message.botMessage != null
+                                    ? BotChatBubble(
+                                        botMessage: message.botMessage!,
+                                        // SAFE: Handle null timestamps gracefully
+                                        timestamp: message.bottimestamp ?? '',
+                                      )
+                                    : const BotFails(),
 
-                              // UI FIX: Only show the loading animation for the newest message.
-                              // Older messages will fall through to display their actual content.
-                              (controller.replyLoading.value && isNewestMessage)
-                                  ? const BotLoading()
-                                  : message.botMessage != null
-                                  ? BotChatBubble(
-                                      botMessage: message.botMessage!,
-                                      // SAFE: Handle null timestamps gracefully
-                                      timestamp: message.bottimestamp ?? '',
-                                    )
-                                  : const BotFails(),
-
-                              // BotLoading(),
-                            ],
+                                // BotLoading(),
+                              ],
+                            ),
                           );
                         },
                       ),
