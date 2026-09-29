@@ -9,15 +9,9 @@ class GlobalView extends GetView<GlobalController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('GlobalView'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('GlobalView'), centerTitle: true),
       body: const Center(
-        child: Text(
-          'GlobalView is working',
-          style: TextStyle(fontSize: 20),
-        ),
+        child: Text('GlobalView is working', style: TextStyle(fontSize: 20)),
       ),
     );
   }

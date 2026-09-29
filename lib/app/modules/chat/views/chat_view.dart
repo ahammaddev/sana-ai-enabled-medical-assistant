@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import 'package:get/get.dart';
-import 'package:sana/app/modules/chat/views/bot_chat_bubble.dart';
-import 'package:sana/app/modules/chat/views/bot_fails.dart';
-import 'package:sana/app/modules/chat/views/bot_loading.dart';
+import 'package:sana/app/modules/chat/views/chat_intro.dart';
+import 'package:sana/app/modules/chat/views/message_pair.dart';
 import 'package:sana/app/modules/chat/views/prompt_field.dart';
-import 'package:sana/app/modules/chat/views/user_chat_bubble.dart';
 import 'package:sana/app/utils/constants/colors/app_colors.dart';
+import 'package:sana/app/utils/constants/helpers/confirm_dialog.dart';
 
 import '../controllers/chat_controller.dart';
 
 class ChatView extends GetView<ChatController> {
   const ChatView({super.key});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.neutral,
         image: DecorationImage(
           image: AssetImage('assets/images/lines.png'),
@@ -30,130 +30,112 @@ class ChatView extends GetView<ChatController> {
         appBar: AppBar(
           surfaceTintColor: AppColors.neutral,
           backgroundColor: AppColors.neutral,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  FaIcon(FontAwesomeIcons.robot, color: AppColors.primary),
-                  SizedBox(width: 5),
-                  Text(
-                    'Sana',
+          leading: Navigator.canPop(context)
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: () => Get.back(),
+                )
+              : null,
+          title: Obx(() {
+            final title = controller.sessionTitle.value.isNotEmpty
+                ? controller.sessionTitle.value
+                : 'Sana';
+            return Row(
+              children: [
+                const FaIcon(FontAwesomeIcons.robot, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
                     style: theme.textTheme.titleLarge!.copyWith(
                       color: AppColors.primary,
-                      fontSize: 26,
+                      fontSize: 22,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
-              // Image.asset(''),
-            ],
-          ),
-        ),
-        body: Obx(
-          () => controller.isloading.value
-              ? Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                )
-              : Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        physics: BouncingScrollPhysics(),
-                        itemCount: controller.messages.length + 1,
-                        reverse: true,
-                        itemBuilder: (context, index) {
-                          if (index == controller.messages.length) {
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                top: 40.0,
-                                bottom: controller.messages.length == 0
-                                    ? context.mediaQuery.viewInsets.bottom > 0
-                                          ? context.height * 0.14
-                                          : context.height * 0.06
-                                    : 20.0,
-                              ),
-                              child: Column(
-                                children: [
-                                  FaIcon(
-                                    FontAwesomeIcons.robot,
-                                    size: 100,
-                                    color: AppColors.primary,
-                                  ),
-
-                                  SizedBox(height: 5),
-                                  Text(
-                                    'SANA',
-                                    style: theme.textTheme.headlineLarge,
-                                  ),
-                                  Text(
-                                    'AI-powered medical assistant',
-                                    style: theme.textTheme.titleMedium,
-                                  ),
-                                  Text(
-                                    'Developed by Faisal Ahammad',
-                                    style: theme.textTheme.titleSmall,
-                                  ),
-                                  SizedBox(height: 20),
-                                ],
-                              ),
-                            );
-                          }
-                          final message = controller.messages[index];
-                          final isNewestMessage = index == 0;
-                          print(message.bottimestamp);
-
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                UserChatBubble(
-                                  // SAFE: Provide a fallback instead of forcing a crash
-                                  usermessage:
-                                      message.userMessage ??
-                                      'Message unavailable',
-                                  usertimestamp: message.usertimestamp ?? '',
-                                ),
-                                const SizedBox(height: 12),
-                                // UI FIX: Only show the loading animation for the newest message.
-                                // Older messages will fall through to display their actual content.
-                                (controller.replyLoading.value && isNewestMessage)
-                                    ? const BotLoading()
-                                    : message.botMessage != null
-                                    ? BotChatBubble(
-                                        botMessage: message.botMessage!,
-                                        // SAFE: Handle null timestamps gracefully
-                                        timestamp: message.bottimestamp ?? '',
-                                      )
-                                    : const BotFails(),
-
-                                // BotLoading(),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    // SizedBox(height: 10),
-
-                    // BotFails(),
-                    SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: PromptField(),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      '© 2026 MD. FAISAL AHAMMAD',
-                      style: theme.textTheme.bodySmall!.copyWith(
-                        color: AppColors.primarydark,
-                      ),
-                    ),
-                    SizedBox(height: 25),
-                  ],
                 ),
+              ],
+            );
+          }),
+          actions: [
+            Obx(
+              () => IconButton(
+                icon: const Icon(Icons.add, color: AppColors.primary),
+                tooltip: 'New Consultation',
+                onPressed: controller.replyLoading.value
+                    ? null
+                    : controller.startNewConsultation,
+              ),
+            ),
+            Obx(() {
+              if (controller.messages.isEmpty) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: AppColors.secondary,
+                ),
+                tooltip: 'Clear Consultation',
+                onPressed: controller.replyLoading.value
+                    ? null
+                    : () => ConfirmDialog.destructive(
+                        title: 'Clear Consultation',
+                        message:
+                            'Are you sure you want to clear this consultation inbox?',
+                        confirmText: 'Clear',
+                        onConfirm: controller.clearCurrentConsultation,
+                      ),
+              );
+            }),
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Obx(() {
+                if (controller.isloading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  physics: const BouncingScrollPhysics(),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  itemCount: controller.messages.length + 1,
+                  reverse: true,
+                  itemBuilder: (context, index) {
+                    if (index == controller.messages.length) {
+                      return ChatIntro(showTopics: controller.messages.isEmpty);
+                    }
+                    final message = controller.messages[index];
+                    return MessagePair(
+                      key: ValueKey('message_${message.id}'),
+                      message: message,
+                    );
+                  },
+                );
+              }),
+            ),
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: PromptField(),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '© 2026 MD. FAISAL AHAMMAD',
+              style: theme.textTheme.bodySmall!.copyWith(
+                color: AppColors.primarydark,
+              ),
+            ),
+            SizedBox(height: 20 + MediaQuery.of(context).padding.bottom),
+          ],
         ),
       ),
     );

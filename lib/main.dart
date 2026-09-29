@@ -5,16 +5,20 @@ import 'package:sana/app/modules/global/bindings/global_binding.dart';
 import 'package:sana/app/utils/constants/themes/app_theme.dart';
 import 'package:sana/app/utils/routes/app_pages.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      // Every screen uses a light background, so status bar icons stay dark.
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
     ),
   );
-  runApp(MainApp());
+
+  runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {

@@ -1,108 +1,236 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:sana/app/data/models/consultation_model.dart';
 import 'package:sana/app/data/models/message_model.dart';
 import 'package:sana/app/data/repository/chat_repository.dart';
 import 'package:sana/app/data/repository/database_repository.dart';
+import 'package:sana/app/modules/global/controllers/global_controller.dart';
 import 'package:sana/app/utils/constants/helpers/custom_snackbar.dart';
+import 'package:sana/app/utils/constants/helpers/date_formatter.dart';
 
 class ChatController extends GetxController {
-  RxBool isloading = false.obs;
-  RxBool replyLoading = false.obs;
-  RxBool blinkController = false.obs;
-  RxList<MessageModel> messages = <MessageModel>[].obs;
+  final RxString sessionId = ''.obs;
+  final RxString sessionTitle = ''.obs;
+  final RxString sessionCreatedAt = ''.obs;
+  final RxBool isloading = false.obs;
+  final RxBool replyLoading = false.obs;
+  final RxnInt pendingMessageId = RxnInt();
+  final RxBool blinkController = false.obs;
+  final RxList<MessageModel> messages = <MessageModel>[].obs;
   final TextEditingController promptController = TextEditingController();
   final AppDatabase _dbService = AppDatabase.instance;
+  Timer? _blinkTimer;
 
   void blinking() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    _blinkTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       blinkController.value = !blinkController.value;
     });
   }
 
   Future<void> fetchData() async {
-    isloading.value = true;
+    if (sessionId.value.isEmpty) {
+      messages.clear();
+      return;
+    }
+
+    isloading.value = messages.isEmpty;
     try {
-      final fetchedMessages = await _dbService.getMessage();
+      final fetchedMessages = await _dbService.getMessagesBySession(
+        sessionId.value,
+      );
+      if (isClosed) return;
       messages.assignAll(fetchedMessages);
     } catch (e) {
-      CustomSnackbars.failure(title: 'Error', message: e.toString());
+      if (!isClosed) {
+        CustomSnackbars.failure(title: 'Error', message: e.toString());
+      }
     } finally {
-      isloading.value = false;
+      if (!isClosed) isloading.value = false;
     }
   }
 
-  Future<void> getReply() async {
-    final now = DateTime.now();
-    final time = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-    print(time);
+  void sendPrompt(String prompt) {
+    if (replyLoading.value) return;
+    promptController.text = prompt;
+    getReply();
+  }
 
-    // 1. Initial State: Create the message with just the user's input
-    MessageModel message = MessageModel(
-      userMessage: promptController.text,
+  void startNewConsultation() {
+    if (replyLoading.value) return;
+    sessionId.value = '';
+    sessionTitle.value = '';
+    sessionCreatedAt.value = '';
+    messages.clear();
+    promptController.clear();
+  }
+
+  Future<void> clearCurrentConsultation() async {
+    try {
+      if (sessionId.value.isNotEmpty) {
+        await _dbService.deleteConversation(sessionId.value);
+      }
+      startNewConsultation();
+      CustomSnackbars.success(
+        title: 'Cleared',
+        message: 'This consultation has been cleared.',
+      );
+    } catch (e) {
+      CustomSnackbars.failure(title: 'Error', message: e.toString());
+    }
+  }
+
+  Future<bool> _ensureOnline() async {
+    final global = Get.isRegistered<GlobalController>()
+        ? Get.find<GlobalController>()
+        : null;
+    if (global == null) return true;
+    final online = await global.checkInternetConnectivity();
+    if (!online) {
+      CustomSnackbars.failure(
+        title: 'Offline',
+        message: 'No internet connection. Please check your network.',
+      );
+    }
+    return online;
+  }
+
+  Future<void> getReply() async {
+    final promptText = promptController.text.trim();
+    if (promptText.isEmpty || replyLoading.value) return;
+    if (!await _ensureOnline()) return;
+
+    final time = DateFormatter.now();
+
+    // 1. If this is a new consultation, create the conversation inbox entry
+    if (sessionId.value.isEmpty) {
+      final newSessionId = DateTime.now().millisecondsSinceEpoch.toString();
+      final title = promptText.length > 35
+          ? '${promptText.substring(0, 35)}...'
+          : promptText;
+
+      await _dbService.insertConversation(
+        ConsultationModel(
+          id: newSessionId,
+          title: title,
+          createdAt: time,
+          updatedAt: time,
+          lastMessage: promptText,
+        ),
+      );
+
+      sessionId.value = newSessionId;
+      sessionTitle.value = title;
+      sessionCreatedAt.value = time;
+    }
+
+    // 2. Create the message linked to the current consultation sessionId
+    final message = MessageModel(
+      sessionId: sessionId.value,
+      userMessage: promptText,
       usertimestamp: time,
     );
 
-    // 2. CRITICAL: Capture the auto-generated ID from SQLite
-    // When you insert without an ID, SQLite creates one. We must save this ID
-    // so we can update this exact row later instead of creating a new one.
-    int generatedId = await _dbService.insertMessage(message);
-    message.id = generatedId;
+    message.id = await _dbService.insertMessage(message);
     promptController.clear();
-    fetchData();
+    await fetchData();
+
+    await _requestReply(message);
+  }
+
+  Future<void> retryMessage(MessageModel message) async {
+    if (replyLoading.value || message.userMessage == null) return;
+    if (!await _ensureOnline()) return;
+    await _requestReply(message);
+  }
+
+  /// Fetches the bot reply for [message] and persists the outcome. The
+  /// session details are captured up front so the result is written to the
+  /// right consultation even if the user switches away mid-request.
+  Future<void> _requestReply(MessageModel message) async {
+    final targetSessionId = message.sessionId ?? sessionId.value;
+    final targetTitle = sessionTitle.value;
+    final targetCreatedAt = sessionCreatedAt.value;
 
     replyLoading.value = true;
+    pendingMessageId.value = message.id;
 
     try {
-      // 3. Fetch the bot's reply from the API
-      final tempmessage = await ChatRepository().getMessage(
-        prompt: message.userMessage!, // Use the saved text
+      // Earlier exchanges of this consultation, sent along as context.
+      final sessionMessages = await _dbService.getMessagesBySession(
+        targetSessionId,
+      );
+      final history = sessionMessages
+          .where((m) => (m.id ?? 0) < (message.id ?? 0))
+          .toList();
+
+      final reply = await ChatRepository().getMessage(
+        prompt: message.userMessage!,
+        history: history,
       );
 
-      if (tempmessage.status?.toLowerCase() == 'success') {
-        // 4. Update the local object with the bot's response
-        message.botMessage =
-            tempmessage.botMessage; // Note: Ensure this matches your model
-        message.bottimestamp = tempmessage.bottimestamp;
-        message.status = tempmessage.status;
-
-        // 5. PUSH TO DB: Call insert again. Because message.id is not null,
-        // ConflictAlgorithm.replace will update the existing row with the bot's data.
+      if (reply.status?.toLowerCase() == 'success' &&
+          reply.botMessage != null) {
+        final replyTime = reply.bottimestamp ?? DateFormatter.now();
+        message.botMessage = reply.botMessage;
+        message.bottimestamp = replyTime;
+        message.status = reply.status;
         await _dbService.updateMessage(message);
 
-        // 6. Refresh the UI to display the newly saved bot reply
-        fetchData();
+        // Update consultation record's last message and updatedAt
+        await _dbService.updateConversation(
+          ConsultationModel(
+            id: targetSessionId,
+            title: targetTitle,
+            createdAt: targetCreatedAt.isNotEmpty ? targetCreatedAt : replyTime,
+            updatedAt: replyTime,
+            lastMessage: message.botMessage,
+          ),
+        );
       } else {
-        // Handle API failure gracefully (optional but recommended)
         message.status = 'failed';
         await _dbService.updateMessage(message);
-        fetchData();
       }
     } catch (e) {
-      // Handle network or parsing errors
       message.status = 'error';
       await _dbService.updateMessage(message);
-      fetchData();
     } finally {
-      replyLoading.value = false;
+      if (!isClosed) {
+        replyLoading.value = false;
+        pendingMessageId.value = null;
+        if (sessionId.value == targetSessionId) await fetchData();
+      }
     }
+  }
+
+  Future<void> _loadSessionMeta() async {
+    try {
+      final conversation = await _dbService.getConversation(sessionId.value);
+      if (conversation == null || isClosed) return;
+      sessionCreatedAt.value = conversation.createdAt;
+      if (sessionTitle.value.isEmpty) sessionTitle.value = conversation.title;
+    } catch (_) {}
   }
 
   @override
   void onInit() {
     super.onInit();
-    fetchData();
+    final args = Get.arguments;
+    if (args is Map) {
+      sessionId.value = args['sessionId'] as String? ?? '';
+      sessionTitle.value = args['title'] as String? ?? '';
+    }
+    if (sessionId.value.isNotEmpty) {
+      _loadSessionMeta();
+      fetchData();
+    }
     blinking();
   }
 
   @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
   void onClose() {
+    _blinkTimer?.cancel();
+    promptController.dispose();
     super.onClose();
   }
 }

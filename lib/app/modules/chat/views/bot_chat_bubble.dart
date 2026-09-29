@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sana/app/modules/chat/controllers/chat_controller.dart';
 import 'package:sana/app/utils/constants/colors/app_colors.dart';
+import 'package:sana/app/utils/constants/helpers/custom_snackbar.dart';
 
 class BotChatBubble extends GetView<ChatController> {
   const BotChatBubble({
@@ -12,6 +14,14 @@ class BotChatBubble extends GetView<ChatController> {
 
   final String botMessage;
   final String timestamp;
+
+  void _copyToClipboard() {
+    Clipboard.setData(ClipboardData(text: botMessage));
+    CustomSnackbars.success(
+      title: 'Copied',
+      message: 'Consultation response copied to clipboard.',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +62,7 @@ class BotChatBubble extends GetView<ChatController> {
           ),
           const SizedBox(height: 8),
           ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: maxWidth,
-            ),
+            constraints: BoxConstraints(maxWidth: maxWidth),
             child: Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
@@ -71,7 +79,7 @@ class BotChatBubble extends GetView<ChatController> {
                   top: BorderSide(width: 1, color: Colors.white.withAlpha(200)),
                 ),
               ),
-              child: Text(
+              child: SelectableText(
                 botMessage,
                 style: theme.textTheme.bodyMedium!.copyWith(
                   fontSize: 15,
@@ -81,11 +89,44 @@ class BotChatBubble extends GetView<ChatController> {
             ),
           ),
           const SizedBox(height: 6),
-          Text(
-            timestamp,
-            style: theme.textTheme.bodySmall!.copyWith(
-              color: Colors.grey.withAlpha(150),
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                timestamp,
+                style: theme.textTheme.bodySmall!.copyWith(
+                  color: Colors.grey.withAlpha(150),
+                ),
+              ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: _copyToClipboard,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.copy_rounded,
+                        size: 11,
+                        color: Colors.grey.withAlpha(150),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        'Copy',
+                        style: theme.textTheme.bodySmall!.copyWith(
+                          fontSize: 10.5,
+                          color: Colors.grey.withAlpha(150),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

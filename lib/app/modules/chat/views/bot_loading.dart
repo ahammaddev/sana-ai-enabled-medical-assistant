@@ -12,14 +12,15 @@ class BotLoading extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: maxWidth,
-        ),
+        constraints: BoxConstraints(maxWidth: maxWidth),
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.primary.withAlpha(10),
             border: Border(
-              left: BorderSide(width: 2, color: AppColors.primary.withAlpha(80)),
+              left: BorderSide(
+                width: 2,
+                color: AppColors.primary.withAlpha(80),
+              ),
             ),
           ),
           padding: const EdgeInsets.all(10),

@@ -39,9 +39,7 @@ class UserChatBubble extends GetView<ChatController> {
           ),
           const SizedBox(height: 8),
           ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: maxWidth,
-            ),
+            constraints: BoxConstraints(maxWidth: maxWidth),
             child: Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(

@@ -1,5 +1,6 @@
 class MessageModel {
   int? id;
+  String? sessionId;
   String? userMessage;
   String? botMessage;
   String? status;
@@ -7,6 +8,8 @@ class MessageModel {
   String? usertimestamp;
 
   MessageModel({
+    this.id,
+    this.sessionId,
     this.userMessage,
     this.botMessage,
     this.status,
@@ -15,6 +18,8 @@ class MessageModel {
   });
 
   MessageModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    sessionId = json['sessionId'];
     userMessage = json['userMessage'];
     botMessage = json['message'];
     status = json['status'];
@@ -23,12 +28,14 @@ class MessageModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['userMessage'] = this.userMessage;
-    data['message'] = this.botMessage;
-    data['status'] = this.status;
-    data['bottimestamp'] = this.bottimestamp;
-    data['usertimestamp'] = this.usertimestamp;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (id != null) data['id'] = id;
+    data['sessionId'] = sessionId;
+    data['userMessage'] = userMessage;
+    data['message'] = botMessage;
+    data['status'] = status;
+    data['bottimestamp'] = bottimestamp;
+    data['usertimestamp'] = usertimestamp;
     return data;
   }
 }

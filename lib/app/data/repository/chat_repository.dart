@@ -8,8 +8,17 @@ import 'package:sana/app/data/providers/base_provider.dart';
 import 'package:sana/app/utils/constants/config/app_urls.dart';
 
 class ChatRepository extends GetConnect {
-  Future<MessageModel> getMessage({required String prompt}) async {
-    final Map<String, dynamic> body = {"message": prompt};
+  static const int maxContextExchanges = 6;
+
+  static const int maxContextChars = 600;
+
+  Future<MessageModel> getMessage({
+    required String prompt,
+    List<MessageModel> history = const [],
+  }) async {
+    final Map<String, dynamic> body = {
+      "message": buildPromptWithContext(prompt: prompt, history: history),
+    };
 
     final http.Response response = await BaseProvider().postDataWithToken(
       url: AppUrls.url,
@@ -31,5 +40,42 @@ class ChatRepository extends GetConnect {
     } else {
       return MessageModel();
     }
+  }
+
+  static String buildPromptWithContext({
+    required String prompt,
+    required List<MessageModel> history,
+  }) {
+    final answered =
+        history
+            .where(
+              (m) =>
+                  (m.userMessage?.trim().isNotEmpty ?? false) &&
+                  (m.botMessage?.trim().isNotEmpty ?? false),
+            )
+            .toList()
+          ..sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
+
+    if (answered.isEmpty) return prompt;
+
+    final recent = answered.length > maxContextExchanges
+        ? answered.sublist(answered.length - maxContextExchanges)
+        : answered;
+
+    final transcript = recent
+        .map(
+          (m) =>
+              'User: ${_trim(m.userMessage!)}\nSana: ${_trim(m.botMessage!)}',
+        )
+        .join('\n');
+
+    return 'Previous conversation:\n$transcript\n\nCurrent question: $prompt';
+  }
+
+  static String _trim(String text) {
+    final clean = text.trim();
+    return clean.length > maxContextChars
+        ? '${clean.substring(0, maxContextChars)}...'
+        : clean;
   }
 }
