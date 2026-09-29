@@ -1,0 +1,24 @@
+# Runtime dependencies for the Sana API (installed in the Docker image).
+# Test extras: requirements-dev.txt. Notebook extras: ../notebooks/requirements.txt.
+
+# --- Web server ---
+flask
+
+# --- Environment Variables ---
+python-dotenv
+
+# --- LangChain Ecosystem (Constrained to stable 0.3.x architecture) ---
+langchain==0.3.26
+langchain-core==0.3.84
+langchain-huggingface
+langchain-pinecone
+langchain-groq<0.3.0
+
+# --- Vector Database ---
+pinecone
+
+# --- Local ML / Tokenization Backends ---
+torch
+transformers
+sentence-transformers
+sentencepiece

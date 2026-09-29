@@ -1,0 +1,18 @@
+# Everything the notebooks need: the backend runtime stack plus research extras.
+
+# --- Document Ingestion (PDF loading & chunking) ---
+langchain-community>=0.3.0,<1.0.0
+langchain-text-splitters
+pypdf
+
+# --- Evaluation Pipeline ---
+evaluate
+bert_score
+numpy
+
+# --- Telemetry & Visualization ---
+matplotlib
+seaborn
+
+# --- Jupyter ---
+jupyter
