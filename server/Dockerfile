@@ -14,7 +14,7 @@ ENV HOME=/home/user \
 WORKDIR $HOME/app
 
 # Copy only the backend (app.py, sana/, setup.py, requirements.txt)
-COPY --chown=user backend/ .
+COPY --chown=user server/ .
 
 # Install runtime dependencies
 RUN pip install --no-cache-dir --upgrade pip && \

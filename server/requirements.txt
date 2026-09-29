@@ -1,5 +1,4 @@
 # Runtime dependencies for the Sana API (installed in the Docker image).
-# Test extras: requirements-dev.txt. Notebook extras: ../notebooks/requirements.txt.
 
 # --- Web server ---
 flask
